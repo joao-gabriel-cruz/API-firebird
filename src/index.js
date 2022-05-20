@@ -6,10 +6,10 @@ const port = 7777;
 
 app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`API rodando na porta ${port}...`);
-});
-
 app.use('/produtos', cadProduto);
 
 app.get('/', (req, res) => res.send('hello'));
+
+app.listen(port, () => {
+  console.log(`API rodando na porta ${port}...`);
+});

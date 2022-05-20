@@ -1,13 +1,37 @@
-const DATABASE = require('node-firebird')
+const Firebird = require('node-firebird');
 
-const options = {}
+const options = {
+  host: 'localhost',
+  port: 3050,
+  database: 'C:\\Joao\\projeto-firebird\\BASEDADOS.FDB',
+  user: 'SYSDBA',
+  password: 'masterkey',
+};
 
-options.host = 'localhost';
-options.port = 3050;
-options.database = 'C:\\Joao\\projeto-firebird\\BASEDADOS.FDB';
-options.user = 'SYSDBA';
-options.password = 'masterkey'
+function Contect(sql) {
+  return new Promise((resolve, reject) => {
+    try {
+      
+        Firebird.attach(options, (err, db) => {
+          if (err) {
+            reject(err);
+          }
+          db.query(sql, (err, result) => {
+            if (err) {
+              reject(err);
+            }
+            db.detach();
+            resolve(result);
+          });
+        })
+     
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    }
+  });
+}
 
-const pool = DATABASE.pool(5,options)
-
-module.exports = pool
+module.exports = {
+  Contect,
+};

@@ -1,103 +1,60 @@
 const router = require('express').Router();
 
-const pool = require('../data/conect');
+const { options, Contect } = require('../data/conect');
 
 const cadProduto = router;
 
 cadProduto.get(`/`, (require, response) => {
-  pool.get((err, db) => {
-    if (err) {
-      throw response.send(err);
-    }
-    db.query(`SELECT NOME, ID_PRODUTO FROM CADPRODUTO `, (err, result) => {
-      if (err) {
-        throw console.log(err);
-      }
-      response.send(result);
-    });
-  });
+  var result = Contect(`SELECT NOME, ID_PRODUTO FROM CADPRODUTO`);
+  result
+    .then((result) => response.send(result))
+    .catch((err) => response.status(404).send(err));
 });
 
-cadProduto.post('/', (require, response) => {
+cadProduto.post(`/`, (require, response) => {
   const produto = require.body;
-  pool.get((err, db) => {
-    if (err) {
-      throw console.log(err);
-    }
-    db.query(
-      `INSERT INTO CADPRODUTO (ID_PRODUTO, NOME, DATA_CADASTRO, PRECO_VEND ) VALUES (
-        '${produto.ID_PRODUTO}','${produto.NOME}','${produto.DATA_CADASTRO}','${produto.PRECO_VEND}'
-        )`,
-      (err, result) => {
-        if (err) {
-          response.status(404).send();
-          throw console.log(err);
-        }
-        response.send(result);
-        console.log('produto criadado ;)');
-      }
-    );
-  });
+  const result = Contect(
+    `INSERT INTO CADPRODUTO (ID_PRODUTO, NOME, DATA_CADASTRO, PRECO_VEND ) VALUES (
+    '${produto.ID_PRODUTO}','${produto.NOME}','${produto.DATA_CADASTRO}','${produto.PRECO_VEND}'
+    )`
+  );
+
+  result
+    .then((result) => response.send(result))
+    .catch((err) => response.status(404).send(err));
 });
 
 cadProduto.get(`/:id`, (require, response) => {
-  const id = require.params.id
-  pool.get((err, db) => {
-    if (err) {
-      throw response.send(err);
-    }
-    db.query(`SELECT * FROM CADPRODUTO WHERE ID_PRODUTO = '${id}'`, (err, result) => {
-      if (err) {
-        throw console.log(err);
-      }
-      response.send(result);
-    });
-  });
+  const id = require.params.id;
+  var result = Contect(
+    `SELECT NOME, ID_PRODUTO FROM CADPRODUTO WHERE ID_PRODUTO = '${id}'`
+  );
+  result
+    .then((result) => response.send(result))
+    .catch((err) => console.log(err));
 });
 
 cadProduto.put('/:id', (require, response) => {
   const produto = require.body;
   const id = require.params.id;
-  pool.get((err, db) => {
-    if (err) {
-      throw console.log(err);
-    }
-    db.query(
-      `
-        UPDATE CADPRODUTO SET NOME = '${produto.NOME}',
+
+  const result = Contect(
+    ` UPDATE CADPRODUTO SET NOME = '${produto.NOME}',
         DATA_CADASTRO = '${produto.DATA_CADASTRO}',
         PRECO_VEND = '${produto.PRECO_VEND}' 
         WHERE ID_PRODUTO = '${id}'
-        `,
-      (err) => {
-        if (err) {
-          response.status(404).send();
-          throw console.log(err);
-        } else {
-          response.status(204).send();
-          console.log('produto atualizado :)');
-        }
-      }
-    );
-  });
+        `
+  );
+  result
+    .then(response.status(204).send())
+    .catch((err) => response.status(404).send(err));
 });
 
 cadProduto.delete('/:id', (require, response) => {
   const id = require.params.id;
-  pool.get((err, db) => {
-    if (err) {
-      throw console.log(err);
-    }
-    db.query(`DELETE FROM CADPRODUTO WHERE ID_PRODUTO = '${id}'`, (err) => {
-      if (err) {
-        response.status(404).send();
-        throw console.log(err);
-      } else {
-        console.log('produto deletado :_(');
-        response.status(204).send();
-      }
-    });
-  });
+  const result = Contect(`DELETE FROM CADPRODUTO WHERE ID_PRODUTO = '${id}'`);
+
+  result.then(response.status(204).send()).catch(response.status(404).send());
 });
 
 module.exports = cadProduto;
