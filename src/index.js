@@ -1,12 +1,15 @@
-const express = require('express')
-const app = express()
-const port = 7777
+const express = require('express');
+const { cadProduto } = require('./router/router');
 
-app.use(express.json())
+const app = express();
+const port = 7777;
 
-app.listen(port,()=>{
-    console.log(`API rodando na porta ${port}...`);
-})
+app.use(express.json());
 
-app.get('/', (req,res) => res.send('hello'))
+app.listen(port, () => {
+  console.log(`API rodando na porta ${port}...`);
+});
 
+app.use('/produtos', cadProduto);
+
+app.get('/', (req, res) => res.send('hello'));
